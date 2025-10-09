@@ -14,10 +14,11 @@ import plotly.express as px
 #import plotly.graph_objects as go
 import streamlit as st
 
-def cars():
+cars = pd.read_pickle('cars.pkl')
+
+
+def carsy():
     # df <
-    cars = pd.read_pickle('cars.pkl')
-    
     
     # Eerst numerieke kolommen schoonmaken
     cars2 = cars.copy()
@@ -93,4 +94,5 @@ def cars():
 
     fig.update_yaxes(range=[0,150000])
     
+
     return st.plotly_chart(fig, use_container_width=True)
