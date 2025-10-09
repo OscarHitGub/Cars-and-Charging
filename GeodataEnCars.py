@@ -139,30 +139,64 @@ def car_data():
 
     # Filter geldige rijen
     cars_filtered = cars[(cars['breedte'] > 0) & (cars['lengte'] > 0)]
-    cars_sorted = cars_filtered.sort_values(by=['breedte', 'lengte'])
 
-    # Bereken trendline met numpy
-    x = cars_sorted['breedte'].values
-    y = cars_sorted['lengte'].values
-    coeffs = np.polyfit(x, y, 1)  # lineaire fit
-    trendline = np.polyval(coeffs, x)
+    # Groepeer op breedte en lengte en tel aantal identieke auto's
+    cars_grouped = (
+        cars_filtered.groupby(['breedte', 'lengte'])
+                    .size()
+                    .reset_index(name='aantal')
+    )
 
-    st.markdown("---")
-    st.markdown("### 🚘 Vergelijking lengte en breedte van auto's")
+    # Downsample indien te veel punten
+    MAX_POINTS = 5000  # stel limiet in voor plot
+    if len(cars_grouped) > MAX_POINTS:
+        cars_grouped = cars_grouped.sample(n=MAX_POINTS, weights='aantal', random_state=42)
 
-    # Maak scatterplot
+    # Trendline berekenen op de unieke of gesamplede punten
+    x = cars_grouped['breedte'].values
+    y = cars_grouped['lengte'].values
+    trendline = np.polyval(np.polyfit(x, y, 1), x)
+
+    # Marker grootte proportioneel aan aantal identieke auto's
+    sizes = np.clip(cars_grouped['aantal'], 1, 4000)  # max marker size 50
+
+    # Plot met ScatterGL voor snelheid
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x, y=y, mode='markers', name='Auto\'s'))
-    fig.add_trace(go.Scatter(x=x, y=trendline, mode='lines', name='Trendline', line=dict(color='red')))
+    fig.add_trace(go.Scattergl(
+        x=x,
+        y=y,
+        mode='markers',
+        marker=dict(
+            size=sizes,
+            color=sizes,
+            colorscale='Viridis',
+            showscale=True,
+            sizemode='area',
+            sizeref=2.*max(sizes)/(50.**2),  # max marker niet te groot
+        ),
+        text=cars_grouped['aantal'],
+        name="Auto's"
+    ))
+
+    # Trendline toevoegen
+    fig.add_trace(go.Scatter(
+        x=x,
+        y=trendline,
+        mode='lines',
+        line=dict(color='red'),
+        name='Trendline'
+    ))
 
     fig.update_layout(
-        title="Lengte vs Breedte van auto's",
+        title="Lengte vs Breedte van auto's (samengevoegd en downsampled)",
         xaxis_title='Breedte',
-        yaxis_title='Lengte'
+        yaxis_title='Lengte',
+        template='plotly_white',
+        showlegend=False
     )
 
     st.plotly_chart(fig, use_container_width=True)
-
+    
 def lp_map():
     data_openchargemap = requests.get("https://api.openchargemap.io/v3/poi/?output=json&countrycode=NL&maxresults=10000&compact=true&verbose=false&key=5d087822-ce71-42b0-a231-67209f0900a2")
 
@@ -230,3 +264,4 @@ def lp_map():
     # Toon kaart in Streamlit
     m = maak_kaart(provincie)
     st_folium(m, width=1200, height=700)
+
