@@ -1,9 +1,8 @@
 pandas
 geopandas
 plotly
-re
 folium
 numpy
 streamlit_folium
 requests
-sklearn
+scikit-learn
