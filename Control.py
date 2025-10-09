@@ -26,4 +26,5 @@ if pagina == "⚡Laadpalen Data":
     
 elif pagina == "🚗 Auto Dashboard":
     gc.car_data()
-    ec.cars()
+
+    ec.carsy()
