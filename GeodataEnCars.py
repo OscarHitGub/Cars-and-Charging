@@ -198,7 +198,7 @@ def car_data():
     st.plotly_chart(fig, use_container_width=True)
     
 def lp_map():
-    data_openchargemap = requests.get("https://api.openchargemap.io/v3/poi/?output=json&countrycode=NL&maxresults=100&compact=true&verbose=false&key=5d087822-ce71-42b0-a231-67209f0900a2")
+    data_openchargemap = requests.get("https://api.openchargemap.io/v3/poi/?output=json&countrycode=NL&maxresults=1000&compact=true&verbose=false&key=5d087822-ce71-42b0-a231-67209f0900a2")
 
     Laadpalen = pd.json_normalize(data_openchargemap.json())
 
@@ -264,6 +264,7 @@ def lp_map():
     # Toon kaart in Streamlit
     m = maak_kaart(provincie)
     st_folium(m, width=1200, height=700)
+
 
 
 
