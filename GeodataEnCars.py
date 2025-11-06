@@ -127,7 +127,7 @@ def car_data():
         log_y=log_scale
     )
     freq = cars["inrichting"].value_counts().sort_values(ascending=False)
-        fig_inrichting.update_xaxes(
+    fig_inrichting.update_xaxes(
         categoryorder="array", 
         categoryarray=freq.index
     )    
@@ -269,6 +269,7 @@ def lp_map():
     # Toon kaart in Streamlit
     m = maak_kaart(provincie)
     st_folium(m, width=1200, height=700)
+
 
 
 
