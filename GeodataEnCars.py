@@ -126,6 +126,11 @@ def car_data():
         title="Aantal auto’s per inrichting",
         log_y=log_scale
     )
+    freq = cars["inrichting"].value_counts().sort_values(ascending=False)
+        fig_inrichting.update_xaxes(
+        categoryorder="array", 
+        categoryarray=freq.index
+    )    
     fig_inrichting.update_layout(
         xaxis_title='Carrosserie',
         yaxis_title="Aantal auto's (log)" if log_scale else "Aantal auto's",
@@ -264,6 +269,7 @@ def lp_map():
     # Toon kaart in Streamlit
     m = maak_kaart(provincie)
     st_folium(m, width=1200, height=700)
+
 
 
 
